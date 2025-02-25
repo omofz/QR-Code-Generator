@@ -1,49 +1,61 @@
 # QR Code Generator
 
-A simple QR code generator written in Python using the `qrcode` library. This script takes a user's link as input and generates a QR code, storing it as an image file.
+This script generates a QR code for a given link. Once scanned, the QR code redirects the user to the provided URL. The QR code is saved as an SVG image.
 
 ## Features
-- Generates QR codes from user-provided URLs
-- Saves QR codes in image format (JPG, PNG, etc.)
-- Simple and easy to use
+- Generates QR codes from user-provided URLs.
+- Saves QR codes in **SVG** format.
+- Can be used **interactively** or via **command-line arguments**.
 
 ## Prerequisites
-Make sure you have Python installed on your system. You also need to install the `qrcode` and `Pillow` libraries.
+Make sure you have Python installed on your system. You also need the `qrcode` library.
 
+### Install dependencies:
 ```sh
 pip install qrcode[pil]
 ```
 
 ## Usage
-1. Clone the repository or download the script.
-2. Run the script and enter the URL when prompted.
-3. The QR code will be generated and saved as an image file.
 
-### Example Code
+### Run Interactively
+If no link is provided as an argument, the script will prompt the user for a URL:
+```sh
+python script.py
+```
+Then, enter the link manually when prompted.
+
+### Run with Command-Line Argument
+You can also provide the URL directly as a command-line argument:
+```sh
+python script.py "https://example.com"
+```
+This will generate a QR code for `https://example.com` and save it as `qr.svg`.
+
+## Example Code
 ```python
+import sys
 import qrcode
+import qrcode.image.svg as img_svg
 
-def generate_qr_code(link, filename="qrcode.jpg"):
-    qr = qrcode.QRCode(
-        version=1,
-        error_correction=qrcode.constants.ERROR_CORRECT_L,
-        box_size=10,
-        border=4,
-    )
-    qr.add_data(link)
-    qr.make(fit=True)
-    
-    img = qr.make_image(fill="black", back_color="white")
-    img.save(filename)
+def generate_qr_code(link: str, filename="qr.svg"):
+    img = qrcode.make(link, image_factory=img_svg.SvgImage)
+    with open(filename, "wb") as qr:
+        img.save(qr)
     print(f"QR code saved as {filename}")
 
+def main():
+    if len(sys.argv) > 1:
+        link = str(sys.argv[1])
+    else:
+        link = input("Enter the link to generate QR Code: ")
+    generate_qr_code(link)
+
 if __name__ == "__main__":
-    user_link = input("Enter the link to generate QR Code: ")
-    generate_qr_code(user_link)
+    main()
 ```
 
 ## Output
-The generated QR code will be saved as `qrcode.jpg` in the same directory as the script.
+The generated QR code will be saved as `qr.svg` in the same directory as the script.
 
 ## License
 This project is open-source and available under the MIT License.
